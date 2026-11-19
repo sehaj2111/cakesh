@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cakeSh — cake a bite | Custom Theme &amp; Fondant Eggless Cakes in Kharar, Mohali</title>
+  <meta name="description" content="cakeSh (cake a bite) — Handcrafted custom theme &amp; fondant cakes, freshly baked and 100% eggless in Kharar, Mohali. DM @cakeabiteee on Instagram to order." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            berry: '#D95B87',
+            berryDark: '#B8426D',
+            blush: '#F4B6C8',
+            blushSoft: '#FDF0F4',
+            champagne: '#C99A5B',
+            ivory: '#FFF9FA',
+            cocoa: '#2F1B24',
+            cocoaDeep: '#221219',
+            taupe: '#6B4C58'
+          },
+          fontFamily: {
+            serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Three.js & GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+    :root {
+      --berry: #D95B87;
+      --berry-dark: #B8426D;
+      --blush: #F4B6C8;
+      --champagne: #C99A5B;
+      --ivory: #FFF9FA;
+      --cocoa: #2F1B24;
+      --cocoa-deep: #221219;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--ivory);
+      color: var(--cocoa);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+      background-color: var(--ivory);
+      color: var(--cocoa);
+      overflow-x: hidden;
+    }
+
+    /* Fixed 3D Scroll-Driven Background Stage */
+    #patisserie-3d-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 15;
+      opacity: 0.92;
+      transition: opacity 0.6s ease;
+    }
+
+    /* Glass Header Transition */
+    .nav-glass {
+      background: rgba(255, 249, 250, 0.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(217, 91, 135, 0.14);
+      box-shadow: 0 8px 30px rgba(47, 27, 36, 0.06);
+    }
+
+    .nav-hero {
+      background: linear-gradient(180deg, rgba(34, 18, 25, 0.62) 0%, rgba(34, 18, 25, 0) 100%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Editorial Image Hover & 3D Tilt */
+    .cake-card {
+      transform-style: preserve-3d;
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s ease;
+    }
+
+    .cake-card:hover {
+      box-shadow: 0 24px 55px -16px rgba(217, 91, 135, 0.24), 0 10px 24px -12px rgba(47, 27, 36, 0.14);
+    }
+
+    .cake-img-wrap img {
+      transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .cake-card:hover .cake-img-wrap img {
+      transform: scale(1.06);
+    }
+
+    /* Horizontal Filmstrip Scrollbar Hide */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Scroll Progress Bar */
+    #scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, #D95B87, #C99A5B, #F4B6C8);
+      z-index: 60;
+    }
+
+    /* Subtle Hero Grain */
+    .hero-vignette {
+      background:
+        radial-gradient(circle at 50% 42%, rgba(34, 18, 25, 0.18) 0%, rgba(34, 18, 25, 0.72) 100%),
+        linear-gradient(180deg, rgba(34, 18, 25, 0.48) 0%, rgba(34, 18, 25, 0.18) 45%, rgba(34, 18, 25, 0.82) 100%);
+    }
+
+    /* Reduced Motion Support */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      #patisserie-3d-canvas {
+        display: none;
+      }
+    }
+
+    /* Section Scroll Offsets */
+    section[id] {
+      scroll-margin-top: 84px;
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-blush selection:text-cocoa">
+
+  <!-- Scroll Progress Indicator -->
+  <div id="scroll-progress" aria-hidden="true"></div>
+
+  <!-- Global Scroll-Driven 3D Patisserie Canvas -->
+  <canvas id="patisserie-3d-canvas" aria-hidden="true"></canvas>
+
+  <!-- STICKY HEADER & NAVIGATION -->
+  <header id="site-header" class="fixed top-0 inset-x-0 z-50 transition-all duration-500 nav-hero">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <!-- Brand Logo -->
+        <a href="#home" class="flex items-center gap-3 group focus:outline-none">
+          <div class="w-12 h-12 rounded-full overflow-hidden ring-2 ring-white/80 shadow-md bg-white shrink-0 transition-transform duration-300 group-hover:scale-105">
+            <img src="./assets/logo.jpg" alt="cakeSh — cake a bite official logo" class="w-full h-full object-cover" />
+          </div>
+          <div class="leading-tight">
+            <span id="nav-brand-title" class="block font-serif text-2xl font-bold tracking-wide text-white transition-colors">cakeSh</span>
+            <span id="nav-brand-sub" class="block text-[10px] uppercase tracking-[0.26em] text-blush transition-colors">cake a bite</span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden lg:flex items-center gap-7" aria-label="Primary Navigation">
+          <a href="#home" class="nav-link text-xs font-semibold uppercase tracking-[0.18em] text-white/90 hover:text-blush transition-colors">Home</a>
+          <a href="#creations" class="nav-link text-xs font-semibold uppercase tracking-[0.18em] text-white/90 hover:text-blush transition-colors">Creations</a>
+          <a href="#specialties" class="nav-link text-xs font-semibold uppercase tracking-[0.18em] text-white/90 hover:text-blush transition-colors">Specialties</a>
+          <a href="#gallery" class="nav-link text-xs font-semibold uppercase tracking-[0.18em] text-white/90 hover:text-blush transition-colors">Gallery</a>
+          <a href="#about" class="nav-link text-xs font-semibold uppercase tracking-[0.18em] text-white/90 hover:text-blush transition-colors">About</a>
+          <a href="#order" class="nav-link text-xs font-semibold uppercase tracking-[0.18em] text-white/90 hover:text-blush transition-colors">Order</a>
+        </nav>
+
+        <!-- Header CTAs -->
+        <div class="hidden md:flex items-center gap-3">
+          <a href="https://www.instagram.com/cakeabiteee/" target="_blank" rel="noopener noreferrer"
+             id="nav-ig-btn"
+             class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold tracking-wider uppercase border border-white/35 text-white hover:bg-white hover:text-cocoa transition-all duration-300">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
+            Follow on Instagram
+          </a>
+          <button type="button" id="header-dm-btn"
+                  class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold tracking-wider uppercase bg-berry text-white hover:bg-berryDark shadow-lg shadow-berry/25 transition-all duration-300">
+            DM to Order
+          </button>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button type="button" id="mobile-menu-toggle" aria-label="Toggle Menu" aria-expanded="false"
+                class="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-full border border-white/30 text-white hover:bg-white/10 transition-colors">
+          <svg id="icon-hamburger" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="4" y1="7" x2="20" y2="7"></line>
+            <line x1="4" y1="12" x2="20" y2="12"></line>
+            <line x1="4" y1="17" x2="20" y2="17"></line>
+          </svg>
+          <svg id="icon-close" class="w-5 h-5 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-drawer" class="hidden lg:hidden bg-ivory/95 backdrop-blur-xl border-b border-blush/40 shadow-xl">
+      <div class="px-6 py-6 space-y-4">
+        <div class="flex flex-col space-y-3">
+          <a href="#home" class="mobile-nav-link text-sm font-semibold uppercase tracking-[0.18em] text-cocoa hover:text-berry py-1">Home</a>
+          <a href="#creations" class="mobile-nav-link text-sm font-semibold uppercase tracking-[0.18em] text-cocoa hover:text-berry py-1">Creations</a>
+          <a href="#specialties" class="mobile-nav-link text-sm font-semibold uppercase tracking-[0.18em] text-cocoa hover:text-berry py-1">Specialties</a>
+          <a href="#gallery" class="mobile-nav-link text-sm font-semibold uppercase tracking-[0.18em] text-cocoa hover:text-berry py-1">Gallery</a>
+          <a href="#about" class="mobile-nav-link text-sm font-semibold uppercase tracking-[0.18em] text-cocoa hover:text-berry py-1">About</a>
+          <a href="#order" class="mobile-nav-link text-sm font-semibold uppercase tracking-[0.18em] text-cocoa hover:text-berry py-1">Order</a>
+        </div>
+        <div class="pt-4 border-t border-blush/40 flex flex-col gap-3">
+          <button type="button" id="mobile-dm-btn"
+                  class="w-full py-3 rounded-full bg-berry text-white text-xs font-semibold uppercase tracking-[0.18em] shadow-md">
+            Send Ready-to-Send Instagram DM
+          </button>
+          <a href="https://www.instagram.com/cakeabiteee/" target="_blank" rel="noopener noreferrer"
+             class="w-full py-3 rounded-full border border-berry/40 text-cocoa text-center text-xs font-semibold uppercase tracking-[0.18em]">
+            Follow @cakeabiteee on Instagram
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="relative z-20">
+
+    <!-- SECTION 1: CINEMATIC VIDEO HERO -->
+    <section id="home" class="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-cocoaDeep">
+      <!-- Uploaded Hero Video -->
+      <video id="hero-video"
+             class="absolute inset-0 w-full h-full object-cover scale-[1.02]"
+             autoplay muted loop playsinline preload="auto"
+             poster="./assets/cake_pink_bow.jpg">
+        <source src="./assets/hero.mp4" type="video/mp4" />
+      </video>
+
+      <!-- Cinematic Vignette Overlay -->
+      <div class="absolute inset-0 hero-vignette"></div>
+
+      <!-- Hero Content -->
+      <div class="relative z-10 max-w-5xl mx-auto px-6 pt-28 pb-20 text-center text-white">
+        <div class="hero-reveal inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/12 backdrop-blur-md border border-white/25 mb-7">
+          <span class="w-2 h-2 rounded-full bg-blush animate-pulse"></span>
+          <span class="text-[11px] font-semibold uppercase tracking-[0.26em] text-blush">100% Eggless &bull; Freshly Baked &bull; Kharar, Mohali</span>
+        </div>
+
+        <h1 class="hero-reveal font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[5.25rem] font-semibold leading-[1.03] tracking-tight text-white mb-6">
+          Bespoke Theme Cakes,<br />
+          <span class="italic font-medium text-blush">Sculpted for Celebration</span>
+        </h1>
+
+        <p class="hero-reveal max-w-2xl mx-auto text-base sm:text-lg text-white/85 font-light leading-relaxed mb-10">
+          Welcome to <strong class="font-semibold text-white">cakeSh — cake a bite</strong>. From whimsical storybook tiers and sculpted fondant art to rich caramel drip creations, every cake is freshly baked and 100% eggless in Kharar, Mohali.
+        </p>
+
+        <div class="hero-reveal flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="#creations"
+             class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-berry hover:bg-berryDark text-white text-xs font-semibold uppercase tracking-[0.2em] shadow-xl shadow-berry/30 transition-all duration-300 hover:-translate-y-0.5">
+            Explore Creations
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </a>
+          <button type="button" id="hero-dm-btn"
+                  class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-white/14 hover:bg-white text-white hover:text-cocoa backdrop-blur-md border border-white/40 text-xs font-semibold uppercase tracking-[0.2em] transition-all duration-300 hover:-translate-y-0.5">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            DM to Order on Instagram
+          </button>
+        </div>
+
+        <!-- Video Playback Control & Scroll Cue -->
+        <div class="hero-reveal mt-14 flex items-center justify-center gap-6">
+          <button type="button" id="video-toggle-btn"
+                  class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/30 hover:bg-black/50 border border-white/20 text-[11px] uppercase tracking-[0.2em] text-white/85 backdrop-blur-md transition-colors">
+            <span id="video-toggle-dot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span id="video-toggle-label">Pause Reel</span>
+          </button>
+          <a href="#creations" class="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.24em] text-white/75 hover:text-white transition-colors">
+            <span>Scroll to Explore</span>
+            <svg class="w-4 h-4 animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Smooth Bottom Curve Blend -->
+      <div class="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-ivory to-transparent pointer-events-none"></div>
+    </section>
+
+    <!-- BRAND PILLAR MARQUEE STRIP -->
+    <div class="relative z-20 bg-ivory border-y border-blush/35 py-5 overflow-hidden">
+      <div class="max-w-7xl mx-auto px-6 flex flex-wrap items-center justify-center sm:justify-between gap-6 text-xs font-semibold uppercase tracking-[0.22em] text-taupe">
+        <span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-berry"></span>Custom Theme Cakes</span>
+        <span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-champagne"></span>3D Fondant Artistry</span>
+        <span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-berry"></span>100% Eggless</span>
+        <span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-champagne"></span>Freshly Baked</span>
+        <span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-berry"></span>Kharar, Mohali</span>
+      </div>
+    </div>
+
+    <!-- SECTION 2: SIGNATURE CREATIONS (ALL 8 AUTHENTIC CAKES) -->
+    <section id="creations" class="relative z-20 py-24 sm:py-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-14">
+        <div class="max-w-2xl reveal-up">
+          <p class="text-xs font-semibold uppercase tracking-[0.26em] text-berry mb-3">The Cake Collection</p>
+          <h2 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-semibold text-cocoa leading-[1.08]">
+            Handcrafted Creations,<br />
+            <span class="italic font-medium text-berry">Each One Made to Order</span>
+          </h2>
+        </div>
+        <p class="reveal-up max-w-md text-sm sm:text-base text-taupe leading-relaxed">
+          Every photograph below is an authentic cake crafted at <strong class="text-cocoa">cakeSh</strong>. Select any style to inspect the details or launch a ready-to-send Instagram DM pre-filled with that design.
+        </p>
+      </div>
+
+      <!-- Category Filter Tabs -->
+      <div class="reveal-up flex flex-wrap items-center gap-2.5 mb-12" role="tablist" aria-label="Filter cake creations">
+        <button type="button" data-filter="all" class="filter-btn active px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-[0.16em] bg-cocoa text-white transition-all">All Creations (8)</button>
+        <button type="button" data-filter="multi-tier" class="filter-btn px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-[0.16em] bg-white border border-blush/60 text-cocoa hover:border-berry transition-all">Multi-Tier</button>
+        <button type="button" data-filter="kids-theme" class="filter-btn px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-[0.16em] bg-white border border-blush/60 text-cocoa hover:border-berry transition-all">Kids &amp; Story Themes</button>
+        <button type="button" data-filter="fondant-art" class="filter-btn px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-[0.16em] bg-white border border-blush/60 text-cocoa hover:border-berry transition-all">Fondant Art</button>
+        <button type="button" data-filter="celebration" class="filter-btn px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-[0.16em] bg-white border border-blush/60 text-cocoa hover:border-berry transition-all">Drip &amp; Celebration</button>
+      </div>
+
+      <!-- Cakes Grid (Populated via JS for full interactive filtering & modal/DM linking) -->
+      <div id="creations-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7"></div>
+    </section>
+
+    <!-- SECTION 3: DARK EDITORIAL SPECIALTIES & INTERACTIVE 3D CAKE STUDIO -->
+    <section id="specialties" class="relative z-20 bg-cocoaDeep text-ivory py-24 sm:py-32 overflow-hidden">
+      <!-- Soft Ambient Glow -->
+      <div class="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-berry/15 blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-champagne/10 blur-3xl pointer-events-none"></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+
+          <!-- Left Column: Interactive 3D Patisserie Studio Preview -->
+          <div class="lg:col-span-5 reveal-up">
+            <div class="relative rounded-3xl bg-gradient-to-b from-white/10 to-white/5 border border-white/15 p-5 shadow-2xl backdrop-blur-md">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <span class="text-[10px] font-semibold uppercase tracking-[0.24em] text-blush block">Interactive 3D Studio</span>
+                  <h3 class="font-serif text-2xl font-semibold text-white">Inspect Our Signature Craft</h3>
+                </div>
+                <span class="px-3 py-1 rounded-full bg-berry/25 border border-berry/40 text-[10px] font-semibold uppercase tracking-widest text-blush">Drag to Rotate</span>
+              </div>
+
+              <!-- Dedicated Interactive 3D Canvas -->
+              <div class="relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden bg-gradient-to-b from-[#331B25] to-[#1D0F15] border border-white/10">
+                <canvas id="studio-3d-canvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+              </div>
+
+              <!-- Interactive 3D Glaze & Model Controls -->
+              <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2" role="group" aria-label="Choose 3D patisserie glaze theme">
+                  <button type="button" data-glaze="berry" class="glaze-btn active px-3.5 py-1.5 rounded-full text-[11px] font-semibold bg-berry text-white transition-all">Berry Blush</button>
+                  <button type="button" data-glaze="caramel" class="glaze-btn px-3.5 py-1.5 rounded-full text-[11px] font-semibold bg-white/10 text-white/80 hover:bg-white/20 transition-all">Caramel Drip</button>
+                  <button type="button" data-glaze="ocean" class="glaze-btn px-3.5 py-1.5 rounded-full text-[11px] font-semibold bg-white/10 text-white/80 hover:bg-white/20 transition-all">Ocean Pastel</button>
+                </div>
+                <button type="button" id="toggle-spin-btn" class="px-3.5 py-1.5 rounded-full text-[11px] font-semibold border border-white/25 text-blush hover:bg-white/10 transition-colors">
+                  Pause Spin
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Editorial Craft Pillars -->
+          <div class="lg:col-span-7 space-y-10">
+            <div class="reveal-up">
+              <p class="text-xs font-semibold uppercase tracking-[0.26em] text-champagne mb-3">Why Families Choose cakeSh</p>
+              <h2 class="font-serif text-4xl sm:text-5xl font-semibold text-white leading-[1.1]">
+                Freshly Baked Artistry,<br />
+                <span class="italic font-medium text-blush">100% Eggless Without Compromise</span>
+              </h2>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div class="reveal-up p-6 rounded-2xl bg-white/[0.05] border border-white/10 hover:border-blush/40 transition-colors">
+                <span class="font-serif text-3xl text-champagne font-semibold block mb-2">01</span>
+                <h3 class="font-serif text-2xl font-semibold text-white mb-2">Custom Theme &amp; Fondant</h3>
+                <p class="text-sm text-white/75 leading-relaxed">
+                  From mermaid reefs and boho teddy bears to makeup palettes and coquette bows, every detail is personalised around your celebration's theme and name.
+                </p>
+              </div>
+
+              <div class="reveal-up p-6 rounded-2xl bg-white/[0.05] border border-white/10 hover:border-blush/40 transition-colors">
+                <span class="font-serif text-3xl text-champagne font-semibold block mb-2">02</span>
+                <h3 class="font-serif text-2xl font-semibold text-white mb-2">100% Eggless Kitchen</h3>
+                <p class="text-sm text-white/75 leading-relaxed">
+                  Every single cake and sweet creation from cakeSh is completely eggless—crafted so every guest at your table can celebrate together.
+                </p>
+              </div>
+
+              <div class="reveal-up p-6 rounded-2xl bg-white/[0.05] border border-white/10 hover:border-blush/40 transition-colors">
+                <span class="font-serif text-3xl text-champagne font-semibold block mb-2">03</span>
+                <h3 class="font-serif text-2xl font-semibold text-white mb-2">Sculpted &amp; Multi-Tier</h3>
+                <p class="text-sm text-white/75 leading-relaxed">
+                  Showstopping multi-tier birthday centrepieces, illuminated transparent spacer tiers, and gravity-defying 3D fondant structures built to amaze.
+                </p>
+              </div>
+
+              <div class="reveal-up p-6 rounded-2xl bg-white/[0.05] border border-white/10 hover:border-blush/40 transition-colors">
+                <span class="font-serif text-3xl text-champagne font-semibold block mb-2">04</span>
+                <h3 class="font-serif text-2xl font-semibold text-white mb-2">Freshly Baked to Order</h3>
+                <p class="text-sm text-white/75 leading-relaxed">
+                  Prepared fresh in Kharar, Mohali for your event date. Reach out directly via Instagram DM to discuss your theme, size, and celebration details.
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: HORIZONTAL EDITORIAL GALLERY -->
+    <section id="gallery" class="relative z-20 py-24 sm:py-32 bg-blushSoft/65 overflow-hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+        <div class="reveal-up">
+          <p class="text-xs font-semibold uppercase tracking-[0.26em] text-berry mb-3">Visual Showcase</p>
+          <h2 class="font-serif text-4xl sm:text-5xl font-semibold text-cocoa">
+            From Our <span class="italic text-berry">@cakeabiteee</span> Gallery
+          </h2>
+        </div>
+        <div class="reveal-up flex items-center gap-3">
+          <button type="button" id="gallery-prev" aria-label="Scroll gallery left"
+                  class="w-11 h-11 rounded-full bg-white border border-blush text-cocoa hover:bg-berry hover:text-white hover:border-berry flex items-center justify-center shadow-sm transition-all">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
+          <button type="button" id="gallery-next" aria-label="Scroll gallery right"
+                  class="w-11 h-11 rounded-full bg-white border border-blush text-cocoa hover:bg-berry hover:text-white hover:border-berry flex items-center justify-center shadow-sm transition-all">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Horizontal Scroll Filmstrip -->
+      <div id="gallery-track" class="flex gap-6 overflow-x-auto no-scrollbar px-4 sm:px-8 lg:px-16 pb-6 snap-x snap-mandatory scroll-smooth"></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 text-center">
+        <a href="https://www.instagram.com/cakeabiteee/" target="_blank" rel="noopener noreferrer"
+           class="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-white border border-berry/35 text-cocoa hover:bg-berry hover:text-white hover:border-berry text-xs font-semibold uppercase tracking-[0.2em] shadow-sm transition-all duration-300">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+          See All 121 Posts on @cakeabiteee
+        </a>
+      </div>
+    </section>
+
+    <!-- SECTION 5: ABOUT CAKESH -->
+    <section id="about" class="relative z-20 py-24 sm:py-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        <!-- Editorial Composition with Official Logo & Real Cakes -->
+        <div class="lg:col-span-6 relative reveal-up">
+          <div class="grid grid-cols-12 gap-4 items-center">
+            <div class="col-span-7 rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
+              <img src="./assets/cake_pink_bow.jpg" alt="Pastel pink two-tier coquette bow birthday cake by cakeSh" class="w-full h-auto object-cover" loading="lazy" />
+            </div>
+            <div class="col-span-5 space-y-4">
+              <div class="rounded-3xl overflow-hidden shadow-xl border-4 border-white bg-white p-2">
+                <img src="./assets/logo.jpg" alt="Official cakeSh cake a bite emblem" class="w-full h-auto rounded-2xl object-contain" loading="lazy" />
+              </div>
+              <div class="rounded-3xl overflow-hidden shadow-xl border-4 border-white">
+                <img src="./assets/cake_caramel_drip.jpg" alt="Two-tier golden caramel drip birthday cake by cakeSh" class="w-full h-auto object-cover" loading="lazy" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Story & Verified Identity -->
+        <div class="lg:col-span-6 space-y-6 reveal-up">
+          <p class="text-xs font-semibold uppercase tracking-[0.26em] text-berry">About cakeSh — cake a bite</p>
+          <h2 class="font-serif text-4xl sm:text-5xl font-semibold text-cocoa leading-[1.1]">
+            Where Imagination Meets<br />
+            <span class="italic font-medium text-berry">Freshly Baked Sweetness</span>
+          </h2>
+          <p class="text-base text-taupe leading-relaxed">
+            Based in <strong class="text-cocoa">Kharar, Mohali</strong>, <strong class="text-cocoa">cakeSh (cake a bite)</strong> specialises in custom theme and fondant cakes designed to become the heart of your celebration. Whether you are planning a child's first birthday, an ocean adventure, a glamorous beauty theme, or an intimate romantic surprise, every cake is freshly baked and <strong class="text-cocoa">100% eggless</strong>.
+          </p>
+          <p class="text-base text-taupe leading-relaxed">
+            With over 121 creations shared with our Instagram community on <a href="https://www.instagram.com/cakeabiteee/" target="_blank" rel="noopener noreferrer" class="text-berry font-semibold hover:underline">@cakeabiteee</a>, we work directly with you via Instagram DM to bring your theme, colours, and personal touches to life.
+          </p>
+
+          <!-- Verified Metrics Row -->
+          <div class="grid grid-cols-3 gap-4 pt-4 border-t border-blush/50">
+            <div>
+              <span class="block font-serif text-3xl sm:text-4xl font-bold text-berry">100%</span>
+              <span class="text-xs uppercase tracking-[0.16em] text-taupe font-semibold">Eggless</span>
+            </div>
+            <div>
+              <span class="block font-serif text-3xl sm:text-4xl font-bold text-cocoa">121+</span>
+              <span class="text-xs uppercase tracking-[0.16em] text-taupe font-semibold">IG Posts</span>
+            </div>
+            <div>
+              <span class="block font-serif text-3xl sm:text-4xl font-bold text-champagne">Fresh</span>
+              <span class="text-xs uppercase tracking-[0.16em] text-taupe font-semibold">Baked to Order</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 6: CUSTOM READY-TO-SEND INSTAGRAM DM ORDER BUILDER & LOCATION -->
+    <section id="order" class="relative z-20 py-24 sm:py-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div class="rounded-[2rem] bg-gradient-to-br from-white via-ivory to-blushSoft border border-blush/50 shadow-2xl shadow-berry/10 overflow-hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-12">
+
+          <!-- Left Info Panel -->
+          <div class="lg:col-span-5 bg-cocoaDeep text-ivory p-8 sm:p-12 flex flex-col justify-between gap-10">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.26em] text-blush mb-3">Order &amp; Location</p>
+              <h2 class="font-serif text-4xl sm:text-5xl font-semibold text-white leading-tight mb-5">
+                Ready to Order Your <span class="italic text-blush">Dream Cake?</span>
+              </h2>
+              <p class="text-sm sm:text-base text-white/75 leading-relaxed">
+                Customise your message on the right and click the ready-to-send Instagram DM button. We automatically copy your personalised order inquiry and open <strong class="text-white">@cakeabiteee</strong> direct messages so you can paste and send in one tap.
+              </p>
+            </div>
+
+            <div class="space-y-5 border-t border-white/15 pt-7">
+              <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-full bg-berry/20 border border-berry/40 flex items-center justify-center shrink-0 text-blush">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+                <div>
+                  <span class="block text-xs uppercase tracking-[0.2em] text-blush font-semibold">Location</span>
+                  <span class="block text-base font-medium text-white">Kharar, Mohali, Punjab</span>
+                  <a href="https://www.google.com/maps/search/?api=1&query=Kharar+Mohali+Punjab" target="_blank" rel="noopener noreferrer"
+                     class="inline-flex items-center gap-1.5 mt-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-champagne hover:text-white transition-colors">
+                    Get Directions
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg>
+                  </a>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-full bg-berry/20 border border-berry/40 flex items-center justify-center shrink-0 text-blush">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                </div>
+                <div>
+                  <span class="block text-xs uppercase tracking-[0.2em] text-blush font-semibold">Instagram</span>
+                  <a href="https://www.instagram.com/cakeabiteee/" target="_blank" rel="noopener noreferrer" class="block text-base font-medium text-white hover:text-blush transition-colors">@cakeabiteee</a>
+                  <span class="text-xs text-white/60">121 posts &bull; DM to order</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Panel: Custom Ready-to-Send Instagram DM Builder -->
+          <div class="lg:col-span-7 p-8 sm:p-12">
+            <div class="mb-6">
+              <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-berry mb-2">
+                <span class="w-2 h-2 rounded-full bg-berry"></span>
+                Custom Ready-to-Send Instagram DM
+              </span>
+              <h3 class="font-serif text-3xl font-semibold text-cocoa">Personalise Your Order Message</h3>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+              <div>
+                <label for="dm-occasion" class="block text-xs font-semibold uppercase tracking-[0.16em] text-taupe mb-2">Occasion</label>
+                <select id="dm-occasion" class="w-full rounded-xl border border-blush/70 bg-white px-4 py-3 text-sm text-cocoa focus:outline-none focus:ring-2 focus:ring-berry/40">
+                  <option value="Birthday Celebration">Birthday Celebration</option>
+                  <option value="First Birthday (One)">First Birthday (One)</option>
+                  <option value="Kids Theme Party">Kids Theme Party</option>
+                  <option value="Romantic / Anniversary">Romantic / Anniversary</option>
+                  <option value="Custom Event / Other">Custom Event / Other</option>
+                </select>
+              </div>
+              <div>
+                <label for="dm-style" class="block text-xs font-semibold uppercase tracking-[0.16em] text-taupe mb-2">Cake Inspiration</label>
+                <select id="dm-style" class="w-full rounded-xl border border-blush/70 bg-white px-4 py-3 text-sm text-cocoa focus:outline-none focus:ring-2 focus:ring-berry/40">
+                  <option value="Custom Theme / Own Idea">Custom Theme / Own Idea</option>
+                  <option value="Two-Tier Golden Caramel Drip Cake">Two-Tier Golden Caramel Drip Cake</option>
+                  <option value="Mermaid Under-the-Sea Fondant Cake">Mermaid Under-the-Sea Fondant Cake</option>
+                  <option value="Boho Teddy Bear 'One' Two-Tier Cake">Boho Teddy Bear 'One' Two-Tier Cake</option>
+                  <option value="Jungle Safari Illuminated Spacer Cake">Jungle Safari Illuminated Spacer Cake</option>
+                  <option value="Gravity-Defying 3D Octopus Ocean Cake">Gravity-Defying 3D Octopus Ocean Cake</option>
+                  <option value="Pastel Pink Coquette Bow Two-Tier Cake">Pastel Pink Coquette Bow Two-Tier Cake</option>
+                  <option value="Romantic Red Hearts Couple Cake">Romantic Red Hearts Couple Cake</option>
+                  <option value="Makeup &amp; Glamour Peach Buttercream Cake">Makeup &amp; Glamour Peach Buttercream Cake</option>
+                </select>
+              </div>
+              <div>
+                <label for="dm-date" class="block text-xs font-semibold uppercase tracking-[0.16em] text-taupe mb-2">Celebration Date (Optional)</label>
+                <input type="date" id="dm-date" class="w-full rounded-xl border border-blush/70 bg-white px-4 py-3 text-sm text-cocoa focus:outline-none focus:ring-2 focus:ring-berry/40" />
+              </div>
+              <div>
+                <label for="dm-notes" class="block text-xs font-semibold uppercase tracking-[0.16em] text-taupe mb-2">Name / Theme Notes (Optional)</label>
+                <input type="text" id="dm-notes" placeholder="e.g., Name on cake, colours, weight..." class="w-full rounded-xl border border-blush/70 bg-white px-4 py-3 text-sm text-cocoa placeholder:text-taupe/50 focus:outline-none focus:ring-2 focus:ring-berry/40" />
+              </div>
+            </div>
+
+            <!-- Live Message Preview -->
+            <div class="mb-6">
+              <div class="flex items-center justify-between mb-2">
+                <label for="dm-preview" class="text-xs font-semibold uppercase tracking-[0.16em] text-taupe">Ready-to-Send DM Message</label>
+                <button type="button" id="copy-only-btn" class="text-xs font-semibold text-berry hover:text-berryDark transition-colors">Copy Text Only</button>
+              </div>
+              <textarea id="dm-preview" rows="4" class="w-full rounded-2xl border border-blush/70 bg-blushSoft/50 p-4 text-sm text-cocoa leading-relaxed focus:outline-none focus:ring-2 focus:ring-berry/40"></textarea>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-3">
+              <button type="button" id="send-ig-dm-btn"
+                      class="flex-1 inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full bg-gradient-to-r from-berry to-berryDark hover:opacity-95 text-white text-xs font-semibold uppercase tracking-[0.2em] shadow-xl shadow-berry/25 transition-all hover:-translate-y-0.5">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                Copy &amp; Open Instagram DM
+              </button>
+              <a href="https://www.instagram.com/cakeabiteee/" target="_blank" rel="noopener noreferrer"
+                 class="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-full border border-cocoa/20 hover:border-berry text-cocoa hover:text-berry text-xs font-semibold uppercase tracking-[0.18em] transition-colors">
+                Open Profile
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- PREMIUM FOOTER -->
+  <footer class="relative z-20 bg-cocoaDeep text-ivory border-t border-white/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-10 pb-12 border-b border-white/10">
+
+        <!-- Brand Column -->
+        <div class="md:col-span-5 space-y-5">
+          <div class="flex items-center gap-3.5">
+            <div class="w-14 h-14 rounded-full overflow-hidden ring-2 ring-blush/60 bg-white shrink-0">
+              <img src="./assets/logo.jpg" alt="cakeSh — cake a bite logo" class="w-full h-full object-cover" loading="lazy" />
+            </div>
+            <div>
+              <span class="block font-serif text-3xl font-bold text-white leading-none">cakeSh</span>
+              <span class="block text-[11px] uppercase tracking-[0.26em] text-blush mt-1">cake a bite</span>
+            </div>
+          </div>
+          <p class="text-sm text-white/70 leading-relaxed max-w-sm">
+            Custom theme &amp; fondant cakes, freshly baked and 100% eggless in Kharar, Mohali. Every celebration deserves an unforgettable centrepiece.
+          </p>
+          <div class="flex flex-wrap gap-3 pt-1">
+            <!-- Ready-to-Send Instagram DM Button in Footer -->
+            <button type="button" id="footer-dm-btn"
+                    class="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-berry hover:bg-berryDark text-white text-xs font-semibold uppercase tracking-[0.18em] shadow-lg shadow-berry/25 transition-all">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              Ready-to-Send Instagram DM
+            </button>
+            <a href="https://www.instagram.com/cakeabiteee/" target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center gap-2 px-5 py-3 rounded-full border border-white/25 hover:border-blush text-white hover:text-blush text-xs font-semibold uppercase tracking-[0.18em] transition-colors">
+              Follow @cakeabiteee
+            </a>
+          </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="md:col-span-3 space-y-4">
+          <h3 class="text-xs font-semibold uppercase tracking-[0.22em] text-blush">Explore</h3>
+          <ul class="space-y-2.5 text-sm text-white/75">
+            <li><a href="#home" class="hover:text-blush transition-colors">Home</a></li>
+            <li><a href="#creations" class="hover:text-blush transition-colors">Cake Creations</a></li>
+            <li><a href="#specialties" class="hover:text-blush transition-colors">Specialties &amp; 3D Studio</a></li>
+            <li><a href="#gallery" class="hover:text-blush transition-colors">Visual Gallery</a></li>
+            <li><a href="#about" class="hover:text-blush transition-colors">About cakeSh</a></li>
+            <li><a href="#order" class="hover:text-blush transition-colors">Order via Instagram DM</a></li>
+          </ul>
+        </div>
+
+        <!-- Studio Details -->
+        <div class="md:col-span-4 space-y-4">
+          <h3 class="text-xs font-semibold uppercase tracking-[0.22em] text-blush">Visit &amp; Connect</h3>
+          <p class="text-sm text-white/80">
+            <strong class="text-white">Location:</strong> Kharar, Mohali, Punjab<br />
+            <strong class="text-white">Ordering:</strong> Direct Message on Instagram (<a href="https://www.instagram.com/cakeabiteee/" target="_blank" rel="noopener noreferrer" class="text-blush hover:underline">@cakeabiteee</a>)<br />
+            <strong class="text-white">Specialty:</strong> 100% Eggless &bull; Freshly Baked &bull; Custom Theme &amp; Fondant Cakes
+          </p>
+          <a href="https://www.google.com/maps/search/?api=1&query=Kharar+Mohali+Punjab" target="_blank" rel="noopener noreferrer"
+             class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-champagne hover:text-white transition-colors">
+            Open Kharar, Mohali on Google Maps
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </a>
+        </div>
+
+      </div>
+
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/55">
+        <p>&copy; 2026 cakeSh — cake a bite. All rights reserved.</p>
+        <p>Handcrafted 100% Eggless Custom Cakes &bull; Kharar, Mohali</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- CAKE LIGHTBOX MODAL -->
+  <div id="cake-modal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4 bg-cocoaDeep/80 backdrop-blur-md" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="relative w-full max-w-3xl rounded-3xl bg-ivory overflow-hidden shadow-2xl border border-blush/40 grid grid-cols-1 md:grid-cols-2">
+      <button type="button" id="modal-close" aria-label="Close modal"
+              class="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/90 text-cocoa hover:bg-berry hover:text-white flex items-center justify-center shadow-md transition-colors">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="bg-blushSoft flex items-center justify-center max-h-[65vh] md:max-h-[540px] overflow-hidden">
+        <img id="modal-img" src="" alt="" class="w-full h-full object-cover" />
+      </div>
+      <div class="p-7 sm:p-8 flex flex-col justify-between gap-6">
+        <div>
+          <span id="modal-tag" class="inline-block px-3 py-1 rounded-full bg-blushSoft text-berry text-[10px] font-semibold uppercase tracking-[0.2em] mb-3"></span>
+          <h3 id="modal-title" class="font-serif text-3xl font-semibold text-cocoa mb-3"></h3>
+          <p id="modal-desc" class="text-sm text-taupe leading-relaxed mb-4"></p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3 py-1 rounded-full bg-white border border-blush/60 text-[11px] font-medium text-cocoa">100% Eggless</span>
+            <span class="px-3 py-1 rounded-full bg-white border border-blush/60 text-[11px] font-medium text-cocoa">Freshly Baked</span>
+            <span class="px-3 py-1 rounded-full bg-white border border-blush/60 text-[11px] font-medium text-cocoa">Customisable</span>
+          </div>
+        </div>
+        <div class="space-y-2.5">
+          <button type="button" id="modal-dm-btn"
+                  class="w-full py-3.5 rounded-full bg-berry hover:bg-berryDark text-white text-xs font-semibold uppercase tracking-[0.18em] shadow-lg shadow-berry/25 transition-colors">
+            DM About This Cake on Instagram
+          </button>
+          <button type="button" id="modal-customise-btn"
+                  class="w-full py-3 rounded-full border border-cocoa/20 hover:border-berry text-cocoa hover:text-berry text-xs font-semibold uppercase tracking-[0.18em] transition-colors">
+            Customise Order Message First
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-6 right-6 z-[80] max-w-sm translate-y-24 opacity-0 pointer-events-none transition-all duration-300">
+    <div class="rounded-2xl bg-cocoaDeep text-white px-5 py-4 shadow-2xl border border-blush/40 flex items-start gap-3">
+      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 mt-1.5 shrink-0"></span>
+      <div>
+        <p id="toast-title" class="text-xs font-semibold uppercase tracking-[0.16em] text-blush">Ready to Send</p>
+        <p id="toast-body" class="text-xs text-white/85 mt-0.5 leading-relaxed"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // =========================================================
+      // 1. AUTHENTIC CAKESH DATA (Strictly Grounded in Uploads)
+      // =========================================================
+      const IG_PROFILE_URL = 'https://www.instagram.com/cakeabiteee/';
+      const IG_DM_URL = 'https://ig.me/m/cakeabiteee';
+
+      const CAKES = [
+        {
+          id: 'pink-bow',
+          title: 'Pastel Pink Coquette Bow',
+          category: 'multi-tier',
+          tag: 'Multi-Tier Theme',
+          image: './assets/cake_pink_bow.jpg',
+          desc: 'Two-tier blush pink birthday cake crowned with an oversized organza bow, pearl brooch accent, delicate gold leafing, butterflies, and glossy pink spheres.'
+        },
+        {
+          id: 'caramel-drip',
+          title: 'Golden Caramel Drip Tier',
+          category: 'celebration',
+          tag: 'Signature Drip',
+          image: './assets/cake_caramel_drip.jpg',
+          desc: 'Elegant two-tier whipped cream birthday cake finished with luscious golden caramel drips, piped buttercream rosettes, and a shimmering gold topper.'
+        },
+        {
+          id: 'octopus-ocean',
+          title: '3D Sculpted Octopus Ocean',
+          category: 'fondant-art',
+          tag: 'Gravity-Defying Fondant',
+          image: './assets/cake_octopus.jpg',
+          desc: 'Showstopping gravity-defying fondant creation featuring a sculpted red octopus balancing tilted blue ocean tiers adorned with dolphin, seahorse, and starfish accents.'
+        },
+        {
+          id: 'teddy-one',
+          title: 'Boho Teddy First Birthday',
+          category: 'kids-theme',
+          tag: 'First Birthday',
+          image: './assets/cake_teddy_one.jpg',
+          desc: 'Warm cream two-tier "One" milestone cake styled with earthy rainbow arches, adorable teddy bears, hot air balloons, clouds, gold spheres, and a fondant ladder.'
+        },
+        {
+          id: 'jungle-one',
+          title: 'Illuminated Jungle Safari',
+          category: 'multi-tier',
+          tag: 'Illuminated Multi-Tier',
+          image: './assets/cake_jungle_one.jpg',
+          desc: 'Two-tier sage-and-white safari celebration cake elevated with a glowing fairy-lit transparent acrylic spacer tier, jungle animals, gold spheres, and fondant leaves.'
+        },
+        {
+          id: 'mermaid',
+          title: 'Mermaid Under-the-Sea',
+          category: 'fondant-art',
+          tag: 'Kids Fondant Theme',
+          image: './assets/cake_mermaid.jpg',
+          desc: 'Whimsical pastel aqua and white ocean cake featuring sculpted fondant mermaid tails, purple starfish, coral reefs, edible beach sand, and a personalised shell plaque.'
+        },
+        {
+          id: 'makeup-glam',
+          title: 'Makeup & Glamour Peach',
+          category: 'kids-theme',
+          tag: 'Custom Theme',
+          image: './assets/cake_makeup.jpg',
+          desc: 'Textured peach buttercream cake decorated with beauty palette, makeup brush, designer handbag, and butterfly toppers accented with shimmering gold sugar pearls.'
+        },
+        {
+          id: 'love-hearts',
+          title: 'Romantic Red Hearts',
+          category: 'celebration',
+          tag: 'Romantic Celebration',
+          image: './assets/cake_love_hearts.jpg',
+          desc: 'Clean ivory buttercream birthday cake accented with plump red fondant hearts, a gold calligraphy topper, and a charming "I love you" couple illustration.'
+        }
+      ];
+
+      // =========================================================
+      // 2. RENDER CREATIONS GRID & HORIZONTAL GALLERY
+      // =========================================================
+      const creationsGrid = document.getElementById('creations-grid');
+      const galleryTrack = document.getElementById('gallery-track');
+      let currentFilter = 'all';
+      let activeModalCake = null;
+
+      function renderCreations(filter) {
+        currentFilter = filter;
+        const items = filter === 'all' ? CAKES : CAKES.filter(c => c.category === filter);
+        creationsGrid.innerHTML = items.map(cake => `
+          <article class="cake-card group bg-white rounded-3xl overflow-hidden border border-blush/40 flex flex-col justify-between shadow-sm" data-id="${cake.id}">
+            <div>
+              <div class="cake-img-wrap relative aspect-[4/5] overflow-hidden bg-blushSoft cursor-pointer" data-action="view" data-id="${cake.id}">
+                <img src="${cake.image}" alt="${cake.title} — custom eggless cake by cakeSh" class="w-full h-full object-cover" loading="lazy" />
+                <div class="absolute top-3.5 left-3.5">
+                  <span class="px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-[10px] font-semibold uppercase tracking-[0.18em] text-cocoa shadow-sm">${cake.tag}</span>
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-t from-cocoaDeep/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                  <span class="text-xs font-semibold uppercase tracking-[0.18em] text-white">Click to Inspect &rarr;</span>
+                </div>
+              </div>
+              <div class="p-5">
+                <h3 class="font-serif text-2xl font-semibold text-cocoa leading-snug mb-1.5">${cake.title}</h3>
+                <p class="text-xs text-taupe leading-relaxed line-clamp-3">${cake.desc}</p>
+              </div>
+            </div>
+            <div class="px-5 pb-5 pt-1 flex items-center gap-2">
+              <button type="button" data-action="dm" data-id="${cake.id}"
+                      class="flex-1 py-2.5 rounded-full bg-blushSoft hover:bg-berry text-berry hover:text-white text-[11px] font-semibold uppercase tracking-[0.16em] transition-colors">
+                DM This Style
+              </button>
+              <button type="button" data-action="view" data-id="${cake.id}" aria-label="View ${cake.title}"
+                      class="w-9 h-9 rounded-full border border-blush/70 text-cocoa hover:border-berry hover:text-berry flex items-center justify-center transition-colors shrink-0">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              </button>
+            </div>
+          </article>
+        `).join('');
+
+        attachCardTilt();
+      }
+
+      function renderGallery() {
+        galleryTrack.innerHTML = CAKES.map((cake, idx) => `
+          <div class="snap-center shrink-0 w-[78vw] sm:w-[320px] md:w-[350px] group cursor-pointer" data-action="view" data-id="${cake.id}">
+            <div class="relative aspect-[4/5] rounded-3xl overflow-hidden border-4 border-white shadow-xl bg-white">
+              <img src="${cake.image}" alt="${cake.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+              <div class="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-cocoaDeep/85 via-cocoaDeep/35 to-transparent text-white">
+                <span class="text-[10px] uppercase tracking-[0.22em] text-blush font-semibold">0${idx + 1} &bull; ${cake.tag}</span>
+                <h3 class="font-serif text-2xl font-semibold leading-tight mt-0.5">${cake.title}</h3>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function attachCardTilt() {
+        const cards = creationsGrid.querySelectorAll('.cake-card');
+        cards.forEach(card => {
+          card.addEventListener('mousemove', e => {
+            const rect = card.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width - 0.5;
+            const y = (e.clientY - rect.top) / rect.height - 0.5;
+            card.style.transform = `perspective(900px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg) translateY(-4px)`;
+          });
+          card.addEventListener('mouseleave', () => {
+            card.style.transform = '';
+          });
+        });
+      }
+
+      renderCreations('all');
+      renderGallery();
+
+      // Filter button clicks
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.filter-btn').forEach(b => {
+            b.classList.remove('active', 'bg-cocoa', 'text-white');
+            b.classList.add('bg-white', 'text-cocoa', 'border', 'border-blush/60');
+          });
+          btn.classList.add('active', 'bg-cocoa', 'text-white');
+          btn.classList.remove('bg-white', 'text-cocoa', 'border', 'border-blush/60');
+          renderCreations(btn.dataset.filter);
+        });
+      });
+
+      // Delegated clicks for Creations & Gallery
+      function handleCakeAction(e) {
+        const target = e.target.closest('[data-action]');
+        if (!target) return;
+        const cake = CAKES.find(c => c.id === target.dataset.id);
+        if (!cake) return;
+        if (target.dataset.action === 'view') {
+          openCakeModal(cake);
+        } else if (target.dataset.action === 'dm') {
+          selectCakeForDM(cake.title, true);
+        }
+      }
+      creationsGrid.addEventListener('click', handleCakeAction);
+      galleryTrack.addEventListener('click', handleCakeAction);
+
+      // Gallery Prev / Next
+      document.getElementById('gallery-prev').addEventListener('click', () => {
+        galleryTrack.scrollBy({ left: -370, behavior: 'smooth' });
+      });
+      document.getElementById('gallery-next').addEventListener('click', () => {
+        galleryTrack.scrollBy({ left: 370, behavior: 'smooth' });
+      });
+
+      // =========================================================
+      // 3. LIGHTBOX MODAL LOGIC
+      // =========================================================
+      const cakeModal = document.getElementById('cake-modal');
+      function openCakeModal(cake) {
+        activeModalCake = cake;
+        document.getElementById('modal-img').src = cake.image;
+        document.getElementById('modal-img').alt = cake.title;
+        document.getElementById('modal-tag').textContent = cake.tag;
+        document.getElementById('modal-title').textContent = cake.title;
+        document.getElementById('modal-desc').textContent = cake.desc;
+        cakeModal.classList.remove('hidden');
+        cakeModal.classList.add('flex');
+      }
+      function closeCakeModal() {
+        cakeModal.classList.add('hidden');
+        cakeModal.classList.remove('flex');
+      }
+      document.getElementById('modal-close').addEventListener('click', closeCakeModal);
+      cakeModal.addEventListener('click', e => {
+        if (e.target === cakeModal) closeCakeModal();
+      });
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && !cakeModal.classList.contains('hidden')) closeCakeModal();
+      });
+      document.getElementById('modal-dm-btn').addEventListener('click', () => {
+        if (activeModalCake) {
+          closeCakeModal();
+          selectCakeForDM(activeModalCake.title, true);
+        }
+      });
+      document.getElementById('modal-customise-btn').addEventListener('click', () => {
+        if (activeModalCake) {
+          closeCakeModal();
+          selectCakeForDM(activeModalCake.title, false);
+          document.getElementById('order').scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+
+      // =========================================================
+      // 4. READY-TO-SEND INSTAGRAM DM BUILDER & CLIPBOARD FLOW
+      // =========================================================
+      const dmOccasion = document.getElementById('dm-occasion');
+      const dmStyle = document.getElementById('dm-style');
+      const dmDate = document.getElementById('dm-date');
+      const dmNotes = document.getElementById('dm-notes');
+      const dmPreview = document.getElementById('dm-preview');
+
+      function buildDMMessage() {
+        const occ = dmOccasion.value;
+        const style = dmStyle.value;
+        const dateVal = dmDate.value ? ` | Date: ${dmDate.value}` : '';
+        const notesVal = dmNotes.value.trim() ? ` | Notes: ${dmNotes.value.trim()}` : '';
+        return `Hi cakeSh! I'd love to order a freshly baked 100% eggless custom cake in Kharar, Mohali.\nOccasion: ${occ} | Inspiration: ${style}${dateVal}${notesVal}\nCould you please share availability and order details?`;
+      }
+
+      function updateDMPreview() {
+        dmPreview.value = buildDMMessage();
+      }
+      [dmOccasion, dmStyle, dmDate, dmNotes].forEach(el => {
+        el.addEventListener('input', updateDMPreview);
+        el.addEventListener('change', updateDMPreview);
+      });
+      updateDMPreview();
+
+      function copyTextSafe(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          return navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+        }
+        fallbackCopy(text);
+        return Promise.resolve();
+      }
+
+      function fallbackCopy(text) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (err) {}
+        document.body.removeChild(ta);
+      }
+
+      let toastTimer = null;
+      function showToast(title, body) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toast-title').textContent = title;
+        document.getElementById('toast-body').textContent = body;
+        toast.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+        toast.classList.add('translate-y-0', 'opacity-100');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toast.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+          toast.classList.remove('translate-y-0', 'opacity-100');
+        }, 4200);
+      }
+
+      function triggerInstagramDM(customMessage) {
+        const msg = customMessage || dmPreview.value || buildDMMessage();
+        copyTextSafe(msg).finally(() => {
+          showToast(
+            'Message Copied — Opening Instagram DM',
+            'Paste directly into your @cakeabiteee chat to send your order inquiry.'
+          );
+          window.open(IG_DM_URL, '_blank', 'noopener,noreferrer');
+        });
+      }
+
+      function selectCakeForDM(cakeTitle, openImmediately) {
+        // Try matching select option or default to Custom
+        let matched = false;
+        for (const opt of dmStyle.options) {
+          if (opt.value.toLowerCase().includes(cakeTitle.toLowerCase().split(' ')[0])) {
+            dmStyle.value = opt.value;
+            matched = true;
+            break;
+          }
+        }
+        if (!matched) {
+          dmStyle.value = 'Custom Theme / Own Idea';
+          dmNotes.value = `Inspired by ${cakeTitle}`;
+        }
+        updateDMPreview();
+        if (openImmediately) {
+          triggerInstagramDM(dmPreview.value);
+        }
+      }
+
+      document.getElementById('send-ig-dm-btn').addEventListener('click', () => triggerInstagramDM(dmPreview.value));
+      document.getElementById('copy-only-btn').addEventListener('click', () => {
+        copyTextSafe(dmPreview.value).finally(() => {
+          showToast('Message Copied', 'Your custom cakeSh inquiry is copied and ready to paste in Instagram DM.');
+        });
+      });
+
+      // Header, Hero, Mobile & Footer Ready-to-Send DM Buttons
+      document.getElementById('header-dm-btn').addEventListener('click', () => {
+        document.getElementById('order').scrollIntoView({ behavior: 'smooth' });
+      });
+      document.getElementById('hero-dm-btn').addEventListener('click', () => {
+        document.getElementById('order').scrollIntoView({ behavior: 'smooth' });
+      });
+      document.getElementById('mobile-dm-btn').addEventListener('click', () => {
+        closeMobileMenu();
+        triggerInstagramDM(dmPreview.value);
+      });
+      document.getElementById('footer-dm-btn').addEventListener('click', () => {
+        triggerInstagramDM(dmPreview.value);
+      });
+
+      // =========================================================
+      // 5. STICKY HEADER, MOBILE DRAWER & VIDEO CONTROL
+      // =========================================================
+      const header = document.getElementById('site-header');
+      const brandTitle = document.getElementById('nav-brand-title');
+      const brandSub = document.getElementById('nav-brand-sub');
+      const navLinks = document.querySelectorAll('.nav-link');
+      const navIgBtn = document.getElementById('nav-ig-btn');
+      const mobileToggle = document.getElementById('mobile-menu-toggle');
+      const mobileDrawer = document.getElementById('mobile-drawer');
+      const iconHam = document.getElementById('icon-hamburger');
+      const iconClose = document.getElementById('icon-close');
+      const progressBar = document.getElementById('scroll-progress');
+
+      function updateHeaderOnScroll() {
+        const y = window.scrollY;
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        progressBar.style.width = maxScroll > 0 ? `${Math.min(100, (y / maxScroll) * 100)}%` : '0%';
+
+        if (y > 60) {
+          header.classList.remove('nav-hero');
+          header.classList.add('nav-glass');
+          brandTitle.classList.remove('text-white');
+          brandTitle.classList.add('text-cocoa');
+          brandSub.classList.remove('text-blush');
+          brandSub.classList.add('text-berry');
+          navLinks.forEach(l => {
+            l.classList.remove('text-white/90');
+            l.classList.add('text-cocoa');
+          });
+          if (navIgBtn) {
+            navIgBtn.classList.remove('border-white/35', 'text-white');
+            navIgBtn.classList.add('border-cocoa/25', 'text-cocoa');
+          }
+          mobileToggle.classList.remove('border-white/30', 'text-white');
+          mobileToggle.classList.add('border-cocoa/25', 'text-cocoa');
+        } else {
+          header.classList.add('nav-hero');
+          header.classList.remove('nav-glass');
+          brandTitle.classList.add('text-white');
+          brandTitle.classList.remove('text-cocoa');
+          brandSub.classList.add('text-blush');
+          brandSub.classList.remove('text-berry');
+          navLinks.forEach(l => {
+            l.classList.add('text-white/90');
+            l.classList.remove('text-cocoa');
+          });
+          if (navIgBtn) {
+            navIgBtn.classList.add('border-white/35', 'text-white');
+            navIgBtn.classList.remove('border-cocoa/25', 'text-cocoa');
+          }
+          mobileToggle.classList.add('border-white/30', 'text-white');
+          mobileToggle.classList.remove('border-cocoa/25', 'text-cocoa');
+        }
+      }
+      window.addEventListener('scroll', updateHeaderOnScroll, { passive: true });
+      updateHeaderOnScroll();
+
+      function closeMobileMenu() {
+        mobileDrawer.classList.add('hidden');
+        iconHam.classList.remove('hidden');
+        iconClose.classList.add('hidden');
+        mobileToggle.setAttribute('aria-expanded', 'false');
+      }
+
+      mobileToggle.addEventListener('click', () => {
+        const isOpen = !mobileDrawer.classList.contains('hidden');
+        if (isOpen) {
+          closeMobileMenu();
+        } else {
+          mobileDrawer.classList.remove('hidden');
+          iconHam.classList.add('hidden');
+          iconClose.classList.remove('hidden');
+          mobileToggle.setAttribute('aria-expanded', 'true');
+        }
+      });
+
+      document.querySelectorAll('.mobile-nav-link').forEach(link => {
+        link.addEventListener('click', closeMobileMenu);
+      });
+
+      // Video Play / Pause Control
+      const heroVideo = document.getElementById('hero-video');
+      const videoToggleBtn = document.getElementById('video-toggle-btn');
+      const videoToggleLabel = document.getElementById('video-toggle-label');
+      const videoToggleDot = document.getElementById('video-toggle-dot');
+      videoToggleBtn.addEventListener('click', () => {
+        if (heroVideo.paused) {
+          heroVideo.play().catch(() => {});
+          videoToggleLabel.textContent = 'Pause Reel';
+          videoToggleDot.classList.remove('bg-amber-400');
+          videoToggleDot.classList.add('bg-emerald-400');
+        } else {
+          heroVideo.pause();
+          videoToggleLabel.textContent = 'Play Reel';
+          videoToggleDot.classList.add('bg-amber-400');
+          videoToggleDot.classList.remove('bg-emerald-400');
+        }
+      });
+
+      // =========================================================
+      // 6. GSAP SCROLL-TRIGGERED EDITORIAL ANIMATIONS
+      // =========================================================
+      const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (window.gsap && !prefersReduced) {
+        gsap.registerPlugin(ScrollTrigger);
+
+        gsap.from('.hero-reveal', {
+          y: 36,
+          opacity: 0,
+          duration: 1.05,
+          stagger: 0.14,
+          ease: 'power3.out',
+          delay: 0.15
+        });
+
+        gsap.utils.toArray('.reveal-up').forEach(el => {
+          gsap.from(el, {
+            y: 42,
+            opacity: 0,
+            duration: 0.9,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 86%',
+              once: true
+            }
+          });
+        });
+      }
+
+      // =========================================================
+      // 7. THREE.JS PROCEDURAL 3D PATISSERIE MODELS
+      //    (Floating Scroll-Driven Scene + Interactive Studio)
+      // =========================================================
+      if (window.THREE && !prefersReduced) {
+        // Helper: Build a procedural 3D Cake (inspired by cakeSh logo)
+        function create3DCake(glazeHex, bodyHex, accentHex) {
+          const group = new THREE.Group();
+
+          const bodyMat = new THREE.MeshStandardMaterial({ color: bodyHex, roughness: 0.45, metalness: 0.05 });
+          const glazeMat = new THREE.MeshStandardMaterial({ color: glazeHex, roughness: 0.22, metalness: 0.12 });
+          const creamMat = new THREE.MeshStandardMaterial({ color: 0xfff8f2, roughness: 0.38, metalness: 0.04 });
+          const goldMat = new THREE.MeshStandardMaterial({ color: accentHex, roughness: 0.25, metalness: 0.72 });
+
+          // Gold Cake Stand Plate
+          const plate = new THREE.Mesh(new THREE.CylinderGeometry(1.38, 1.28, 0.09, 40), goldMat);
+          plate.position.y = -0.95;
+          group.add(plate);
+
+          // Bottom Tier
+          const tier1 = new THREE.Mesh(new THREE.CylinderGeometry(1.12, 1.14, 0.92, 40), bodyMat);
+          tier1.position.y = -0.44;
+          group.add(tier1);
+
+          // Bottom Glaze Cap + Drips
+          const cap1 = new THREE.Mesh(new THREE.CylinderGeometry(1.135, 1.135, 0.14, 40), glazeMat);
+          cap1.position.y = 0.02;
+          group.add(cap1);
+
+          for (let i = 0; i < 12; i++) {
+            const ang = (i / 12) * Math.PI * 2;
+            const dripLen = 0.22 + (i % 3) * 0.13;
+            const drip = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.045, dripLen, 14), glazeMat);
+            drip.position.set(Math.cos(ang) * 1.12, -dripLen / 2 + 0.02, Math.sin(ang) * 1.12);
+            group.add(drip);
+          }
+
+          // Top Tier
+          const tier2 = new THREE.Mesh(new THREE.CylinderGeometry(0.74, 0.76, 0.76, 36), bodyMat);
+          tier2.position.y = 0.44;
+          group.add(tier2);
+
+          // Top Glaze Cap
+          const cap2 = new THREE.Mesh(new THREE.CylinderGeometry(0.755, 0.755, 0.12, 36), glazeMat);
+          cap2.position.y = 0.82;
+          group.add(cap2);
+
+          // Piped Cream Rosettes around Top Rim
+          for (let i = 0; i < 10; i++) {
+            const ang = (i / 10) * Math.PI * 2;
+            const dollop = new THREE.Mesh(new THREE.SphereGeometry(0.11, 16, 16), creamMat);
+            dollop.scale.set(1, 0.85, 1);
+            dollop.position.set(Math.cos(ang) * 0.58, 0.92, Math.sin(ang) * 0.58);
+            group.add(dollop);
+          }
+
+          // Signature Strawberry + Blueberries on top (echoing logo.jpg)
+          const berryMat = new THREE.MeshStandardMaterial({ color: 0xe12d60, roughness: 0.28, metalness: 0.08 });
+          const strawberry = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.38, 20), berryMat);
+          strawberry.rotation.z = -0.25;
+          strawberry.rotation.x = Math.PI;
+          strawberry.position.set(0.14, 1.07, 0.04);
+          group.add(strawberry);
+
+          const leafMat = new THREE.MeshStandardMaterial({ color: 0x5ca95d, roughness: 0.5 });
+          const leaf = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.1, 6), leafMat);
+          leaf.position.set(0.18, 1.24, 0.04);
+          leaf.rotation.z = -0.25;
+          group.add(leaf);
+
+          const blueMat = new THREE.MeshStandardMaterial({ color: 0x554275, roughness: 0.3, metalness: 0.15 });
+          const bb1 = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 16), blueMat);
+          bb1.position.set(-0.14, 0.96, 0.12);
+          group.add(bb1);
+          const bb2 = new THREE.Mesh(new THREE.SphereGeometry(0.085, 16, 16), blueMat);
+          bb2.position.set(-0.04, 0.94, -0.14);
+          group.add(bb2);
+
+          // Store material refs for live colour switching
+          group.userData = { glazeMat, bodyMat, goldMat };
+          return group;
+        }
+
+        // Helper: Build a procedural 3D Pink-Glazed Donut (echoing logo.jpg)
+        function create3DDonut() {
+          const group = new THREE.Group();
+          const doughMat = new THREE.MeshStandardMaterial({ color: 0xf2c99d, roughness: 0.65 });
+          const icingMat = new THREE.MeshStandardMaterial({ color: 0xf39bb8, roughness: 0.22, metalness: 0.1 });
+
+          const dough = new THREE.Mesh(new THREE.TorusGeometry(0.52, 0.22, 20, 36), doughMat);
+          group.add(dough);
+
+          const icing = new THREE.Mesh(new THREE.TorusGeometry(0.52, 0.21, 20, 36), icingMat);
+          icing.position.z = 0.05;
+          icing.scale.set(1.01, 1.01, 0.85);
+          group.add(icing);
+
+          // Pastel Sprinkles
+          const colors = [0xffffff, 0xc99a5b, 0xd95b87, 0xffe4a0];
+          for (let i = 0; i < 16; i++) {
+            const ang = (i / 16) * Math.PI * 2;
+            const r = 0.44 + (i % 3) * 0.08;
+            const spr = new THREE.Mesh(
+              new THREE.CylinderGeometry(0.018, 0.018, 0.09, 8),
+              new THREE.MeshStandardMaterial({ color: colors[i % colors.length], roughness: 0.3 })
+            );
+            spr.position.set(Math.cos(ang) * r, Math.sin(ang) * r, 0.24);
+            spr.rotation.z = ang + i * 0.6;
+            group.add(spr);
+          }
+          return group;
+        }
+
+        // Helper: Build a procedural 3D Cupcake (echoing logo.jpg)
+        function create3DCupcake() {
+          const group = new THREE.Group();
+          const cupMat = new THREE.MeshStandardMaterial({ color: 0x9c6e55, roughness: 0.7 });
+          const frostMat = new THREE.MeshStandardMaterial({ color: 0xf4b6c8, roughness: 0.35 });
+          const cherryMat = new THREE.MeshStandardMaterial({ color: 0xd92654, roughness: 0.2, metalness: 0.15 });
+
+          const base = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.3, 0.48, 20), cupMat);
+          base.position.y = -0.22;
+          group.add(base);
+
+          const swirl1 = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.14, 16, 28), frostMat);
+          swirl1.rotation.x = Math.PI / 2;
+          swirl1.position.y = 0.08;
+          group.add(swirl1);
+
+          const swirl2 = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.12, 16, 28), frostMat);
+          swirl2.rotation.x = Math.PI / 2;
+          swirl2.position.y = 0.24;
+          group.add(swirl2);
+
+          const peak = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.22, 18), frostMat);
+          peak.position.y = 0.4;
+          group.add(peak);
+
+          const cherry = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), cherryMat);
+          cherry.position.set(0.04, 0.52, 0.04);
+          group.add(cherry);
+
+          return group;
+        }
+
+        // Helper: Build a procedural 3D Macaron
+        function create3DMacaron(shellHex) {
+          const group = new THREE.Group();
+          const shellMat = new THREE.MeshStandardMaterial({ color: shellHex, roughness: 0.32, metalness: 0.06 });
+          const creamMat = new THREE.MeshStandardMaterial({ color: 0xfff8f2, roughness: 0.45 });
+
+          const topShell = new THREE.Mesh(new THREE.SphereGeometry(0.36, 24, 16), shellMat);
+          topShell.scale.set(1, 0.42, 1);
+          topShell.position.y = 0.11;
+          group.add(topShell);
+
+          const filling = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.11, 24), creamMat);
+          group.add(filling);
+
+          const botShell = new THREE.Mesh(new THREE.SphereGeometry(0.36, 24, 16), shellMat);
+          botShell.scale.set(1, 0.42, 1);
+          botShell.position.y = -0.11;
+          group.add(botShell);
+
+          return group;
+        }
+
+        // --- A. GLOBAL SCROLL-DRIVEN FLOATING 3D PATISSERIE CANVAS ---
+        const bgCanvas = document.getElementById('patisserie-3d-canvas');
+        const bgRenderer = new THREE.WebGLRenderer({ canvas: bgCanvas, alpha: true, antialias: true });
+        bgRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        bgRenderer.setSize(window.innerWidth, window.innerHeight);
+
+        const bgScene = new THREE.Scene();
+        const bgCamera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 100);
+        bgCamera.position.z = 11;
+
+        bgScene.add(new THREE.AmbientLight(0xfff5f7, 0.9));
+        const bgDir1 = new THREE.DirectionalLight(0xffffff, 0.95);
+        bgDir1.position.set(6, 8, 10);
+        bgScene.add(bgDir1);
+        const bgDir2 = new THREE.DirectionalLight(0xf4b6c8, 0.65);
+        bgDir2.position.set(-7, -4, 6);
+        bgScene.add(bgDir2);
+
+        const isMobile = window.innerWidth < 768;
+        const scaleFactor = isMobile ? 0.58 : 0.9;
+
+        const floatDonut = create3DDonut();
+        floatDonut.scale.setScalar(scaleFactor * 1.05);
+        floatDonut.position.set(isMobile ? 2.6 : 5.2, 2.2, -1.5);
+        bgScene.add(floatDonut);
+
+        const floatCupcake = create3DCupcake();
+        floatCupcake.scale.setScalar(scaleFactor * 1.15);
+        floatCupcake.position.set(isMobile ? -2.6 : -5.3, -1.4, -1.2);
+        bgScene.add(floatCupcake);
+
+        const floatMacaronGold = create3DMacaron(0xd9a86c);
+        floatMacaronGold.scale.setScalar(scaleFactor * 1.05);
+        floatMacaronGold.position.set(isMobile ? 2.4 : 4.9, -2.5, -2.2);
+        bgScene.add(floatMacaronGold);
+
+        const floatMacaronRose = create3DMacaron(0xd95b87);
+        floatMacaronRose.scale.setScalar(scaleFactor * 0.92);
+        floatMacaronRose.position.set(isMobile ? -2.3 : -4.8, 2.7, -2.6);
+        bgScene.add(floatMacaronRose);
+
+        // Soft Golden Sugar Pearls
+        const pearlsGroup = new THREE.Group();
+        const pearlMat = new THREE.MeshStandardMaterial({ color: 0xe6c185, roughness: 0.2, metalness: 0.75 });
+        for (let i = 0; i < 14; i++) {
+          const p = new THREE.Mesh(new THREE.SphereGeometry(0.065 + (i % 3) * 0.025, 12, 12), pearlMat);
+          p.position.set(
+            (Math.random() - 0.5) * 14,
+            (Math.random() - 0.5) * 9,
+            -3.5 - Math.random() * 2.5
+          );
+          pearlsGroup.add(p);
+        }
+        bgScene.add(pearlsGroup);
+
+        let mouseX = 0, mouseY = 0;
+        window.addEventListener('mousemove', e => {
+          mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+          mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+        }, { passive: true });
+
+        window.addEventListener('resize', () => {
+          bgCamera.aspect = window.innerWidth / window.innerHeight;
+          bgCamera.updateProjectionMatrix();
+          bgRenderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- B. INTERACTIVE 3D STUDIO CAKE INSPECTOR ---
+        const studioCanvas = document.getElementById('studio-3d-canvas');
+        const studioRenderer = new THREE.WebGLRenderer({ canvas: studioCanvas, alpha: true, antialias: true });
+        studioRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+        const studioScene = new THREE.Scene();
+        const studioCamera = new THREE.PerspectiveCamera(38, 1, 0.1, 50);
+        studioCamera.position.set(0, 0.6, 5.1);
+        studioCamera.lookAt(0, 0.05, 0);
+
+        studioScene.add(new THREE.AmbientLight(0xfff4f6, 0.85));
+        const sKey = new THREE.DirectionalLight(0xffffff, 1.15);
+        sKey.position.set(4, 6, 6);
+        studioScene.add(sKey);
+        const sRim = new THREE.DirectionalLight(0xf4b6c8, 0.8);
+        sRim.position.set(-5, 2, -4);
+        studioScene.add(sRim);
+
+        const studioCake = create3DCake(0xd95b87, 0xffeef2, 0xc99a5b);
+        studioCake.position.y = -0.08;
+        studioScene.add(studioCake);
+
+        function resizeStudio() {
+          const rect = studioCanvas.parentElement.getBoundingClientRect();
+          if (rect.width > 0 && rect.height > 0) {
+            studioRenderer.setSize(rect.width, rect.height, false);
+            studioCamera.aspect = rect.width / rect.height;
+            studioCamera.updateProjectionMatrix();
+          }
+        }
+        resizeStudio();
+        window.addEventListener('resize', resizeStudio);
+
+        // Drag to Rotate Studio Cake
+        let isDragging = false, prevX = 0, prevY = 0;
+        let autoSpin = true;
+        studioCanvas.addEventListener('pointerdown', e => {
+          isDragging = true;
+          prevX = e.clientX;
+          prevY = e.clientY;
+        });
+        window.addEventListener('pointermove', e => {
+          if (!isDragging) return;
+          const dx = e.clientX - prevX;
+          const dy = e.clientY - prevY;
+          studioCake.rotation.y += dx * 0.012;
+          studioCake.rotation.x = Math.max(-0.45, Math.min(0.45, studioCake.rotation.x + dy * 0.008));
+          prevX = e.clientX;
+          prevY = e.clientY;
+        });
+        window.addEventListener('pointerup', () => { isDragging = false; });
+
+        // Glaze Switcher Controls
+        const GLAZES = {
+          berry: { glaze: 0xd95b87, body: 0xffeef2 },
+          caramel: { glaze: 0xb86228, body: 0xfff8ee },
+          ocean: { glaze: 0x64b5d6, body: 0xf2fbff }
+        };
+        document.querySelectorAll('.glaze-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.glaze-btn').forEach(b => {
+              b.classList.remove('active', 'bg-berry', 'text-white');
+              b.classList.add('bg-white/10', 'text-white/80');
+            });
+            btn.classList.add('active', 'bg-berry', 'text-white');
+            btn.classList.remove('bg-white/10', 'text-white/80');
+            const preset = GLAZES[btn.dataset.glaze];
+            if (preset && studioCake.userData.glazeMat) {
+              studioCake.userData.glazeMat.color.setHex(preset.glaze);
+              studioCake.userData.bodyMat.color.setHex(preset.body);
+            }
+          });
+        });
+
+        const toggleSpinBtn = document.getElementById('toggle-spin-btn');
+        toggleSpinBtn.addEventListener('click', () => {
+          autoSpin = !autoSpin;
+          toggleSpinBtn.textContent = autoSpin ? 'Pause Spin' : 'Resume Spin';
+        });
+
+        // Unified Animation Loop
+        const clock = new THREE.Clock();
+        function animate3D() {
+          requestAnimationFrame(animate3D);
+          const t = clock.getElapsedTime();
+          const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+          const scrollP = Math.min(1, window.scrollY / maxScroll);
+
+          // Fade background floating objects slightly over the hero video so the video stays crisp
+          bgCanvas.style.opacity = scrollP < 0.06 ? '0.35' : '0.88';
+
+          // Scroll-linked + organic floating motion
+          floatDonut.position.y = 2.1 + Math.sin(t * 0.9) * 0.35 - scrollP * 2.2;
+          floatDonut.position.x = (isMobile ? 2.6 : 5.2) + Math.cos(scrollP * Math.PI * 2) * 0.7;
+          floatDonut.rotation.x = 0.4 + scrollP * 3.2 + Math.sin(t * 0.6) * 0.2;
+          floatDonut.rotation.y = t * 0.35 + scrollP * 2.5;
+
+          floatCupcake.position.y = -1.3 + Math.cos(t * 0.85) * 0.38 + scrollP * 2.4;
+          floatCupcake.rotation.y = -t * 0.4 + scrollP * 4.0;
+          floatCupcake.rotation.z = Math.sin(t * 0.7) * 0.14;
+
+          floatMacaronGold.position.y = -2.4 + Math.sin(t * 1.05 + 1.2) * 0.3 + scrollP * 3.2;
+          floatMacaronGold.rotation.x = t * 0.3 + scrollP * 2.8;
+          floatMacaronGold.rotation.z = t * 0.25;
+
+          floatMacaronRose.position.y = 2.6 + Math.cos(t * 0.95 + 0.5) * 0.32 - scrollP * 3.0;
+          floatMacaronRose.rotation.x = -t * 0.28 + scrollP * 3.0;
+          floatMacaronRose.rotation.y = t * 0.4;
+
+          pearlsGroup.rotation.y = t * 0.04 + scrollP * 0.8;
+          bgCamera.position.x += (mouseX * 0.45 - bgCamera.position.x) * 0.04;
+          bgCamera.position.y += (-mouseY * 0.35 - bgCamera.position.y) * 0.04;
+          bgCamera.lookAt(0, 0, 0);
+
+          bgRenderer.render(bgScene, bgCamera);
+
+          // Studio Cake gentle float + spin
+          if (autoSpin && !isDragging) {
+            studioCake.rotation.y += 0.008;
+          }
+          studioCake.position.y = -0.08 + Math.sin(t * 1.4) * 0.06;
+          studioRenderer.render(studioScene, studioCamera);
+        }
+        animate3D();
+      }
+    })();
+  </script>
+</body>
+</html>
